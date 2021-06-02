@@ -1,118 +1,131 @@
-const products = (() => {
-    const minPrice = 100;
-    const maxPrice = 1000;
-    const names = [
-        "A-Data",
-        "AZUR",
-        "AZARD",
-        "AVEX",
-        "Avery",
-        "AVerM",
-        "AVENGE",
-        "AVAST",
-        "AUTHOR",
-        "AutoEx",
-        "AURAMAX",
-        "Technic",
-        "ATLAS",
-        "ATLANT",
-        "ATEMI",
-        "ASUS",
-        "ASRock",
-        "Artway",
-        "STYLE",
-        "PLAYS",
-        "LAMP",
-        "AROZZI",
-        "Media",
-        "ARK",
-        "Ariston",
-        "ARIEL",
-        "Arian",
-        "Ardo",
-        "EQUAT",
-        "AQUAPO",
-        "AQUAF",
-        "GAELLE",
-        "AquaWork",
-        "AFAR",
-        "APPLET",
-        "Apple",
-        "APC",
-        "AOS",
-        "AOpen",
-        "AOC",
-        "ANKER",
-        "ANIMAL",
-        "Angelcare",
-        "ANDREA",
-        "ANDIS",
-        "AMELY",
-        "AMD",
-        "AMBRE",
-        "AMAZ",
-        "AM-PM",
-        "ALWAYS",
-        "ALUMET"
-    ];
-    const rndItem = (a) => a[Math.floor(Math.random() * a.length)];
-    const rndFloat = () => (Math.random() * (maxPrice - minPrice) + minPrice).toFixed(2);
-    const rndInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
+const API = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
 
-    const items = [];
+// Переделать на Promise (не fetch!!!)
+const getRequest = (url) => new Promise((resolve, reject) => {
+  const xhr = new XMLHttpRequest();
+  xhr.open('GET', url, true);
+  xhr.onreadystatechange = () => {
+    if (xhr.readyState === 4) {
+      if (xhr.status !== 200) {
+        reject(xhr.statusText)
+      } else {
+        resolve(JSON.parse(xhr.responseText, null, 2));
+      }
+    }
+  };
+  xhr.send();
+});
 
-    const add = (totalItems) => {
-        while (totalItems--) {
-            items.push({
-                id: totalItems,
-                title: rndItem(names),
-                price: rndFloat(),
-                img: `http://lorempixel.com/${rndInt(100, 400)}/${rndInt(200, 600)}/technics`,
-                description: 'Отличный товар!'
-            });
-        }
-    };
+class ProductList {
+    #goods;
+    constructor(container = '.products') {
+        this.container = container;
+        this.#goods = [];
+        this.cart = [];
+        this.allProducts = [];
+        this.#fetchGoods().then(data => {
+            this.#goods = [...data];
+            this.#render();
+        });
 
-    return {
-        add,
-        getItems: () => items,
-    };
-})();
-
-const renderProduct = ({id = 0, title = '', price = 0, img = '', description = ''}) => {
-    if (!price) {
-        return '';
+        this.addCartItem = this.addCartItem.bind(this);
+        this.removeCartItem = this.removeCartItem.bind(this);        
+    }
+    
+    #fetchGoods() {
+        return getRequest(`${API}/catalogData.json`)
+        .then(data => data)
+        .catch(console.log);
     }
 
-    return `
-      <div class="product">
-        <div class="productId">${id}</div>
-        <div class="productAside" style="background-image: url('${img}')"></div>
-        <div class="productDetails">
-            <div class="productData">
-              <div class="productTitle">${title}</div>
-              <div class="productPrice">${price}</div>
-            </div>
-            <div class="productControls">
-              <div class="productDescription">${description}</div>
-              <button class="productButton" data-id="${id}">Мне такое надо!</button>
-            </div>
-        </div>
-      </div>
-  `;
-};
+    #render() {
+        const block = document.querySelector(this.container);
+    
+        for (let product of this.#goods) {
+          const productObject = new ProductItem(product);
+    
+          this.allProducts.push(productObject);
+          block.insertAdjacentHTML('beforeend', productObject.render());
+        }
 
-const renderProducts = () => {
-    products.add(50);
-    document.querySelector('.products').innerHTML = products.getItems().map(renderProduct).join('');
-};
+        Array.from(document.querySelectorAll('[data-id]')).forEach(el => {
+            el.addEventListener('click', (e) => {
+                const productId = el.dataset.id;
+                if (e.target.classList.contains('buy-btn')) {
+                    return this.addCartItem(productId);
+                }
+            });
+        });
+    }
 
-renderProducts();
+    getGoodsPrice() {
+        return this.getCartItems().reduce((sumPrice, { price }) => sumPrice + price, 0);
+    }
 
-document.getElementById('logo')
-    .addEventListener('click', () => {
-    [...document.getElementsByTagName('main')][0].classList.toggle('wide');
-}, false);
+    addCartItem(id) {
+        id = parseInt(id, 10);
+        this.cart.push(this.allProducts.find(good => good.id === id));
+        this.renderTotal();
+    }
+
+    findCartItem(id) {
+        if (id) {
+            return this.cart.findIndex(item => item.id === id);
+        }
+        return -1;
+    }
+
+    removeCartItem(id) {
+        id = parseInt(id, 10);
+        const itemPosition = this.findCartItem(id);
+  
+        if (itemPosition !== -1) {
+            this.cart.splice(itemPosition, 1);
+            this.renderTotal();
+        }
+    }
+
+    getCartItems() {
+        return this.cart;
+    }
+    
+    renderTotal() {
+        document.getElementById('cart-total').innerHTML = 
+          `В корзине ${this.getCartItems().length} товаров на ${this.getGoodsPrice()} \u20bd`;        
+  
+        document.getElementById('cart-items').innerHTML = this.getCartItems()
+            .map((item) => `<ul>${item.title} <button data-id="${item.id}" class="remove-btn">x</button></ul>`).join('')
+  
+          Array.from(document.querySelectorAll('.remove-btn'))
+              .forEach(el => {
+                  el.addEventListener('click', () => {
+                      this.removeCartItem(el.dataset.id);
+                  })
+              });
+    }    
+}
+
+class ProductItem {
+    constructor(product, img='http://lorempixel.com/200/150/technics') {
+        this.title = product.product_name;
+        this.price = product.price;
+        this.id = product.id_product;
+        this.img = img
+    }
+
+    render() {
+        return `<div class="product-item" data-id="${this.id}">
+                    <img src="${this.img}" alt="Some img">
+                    <div class="desc">
+                        <h3>${this.title}</h3>
+                        <p>${this.price} \u20bd</p>
+                        <button class="buy-btn">Купить</button>
+                    </div>
+                </div>`;
+    }
+}
+
+const list = new ProductList();
 
 // const init = () => {
 //     renderProducts();
