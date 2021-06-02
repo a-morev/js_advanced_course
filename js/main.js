@@ -1,118 +1,93 @@
-const products = (() => {
-    const minPrice = 100;
-    const maxPrice = 1000;
-    const names = [
-        "A-Data",
-        "AZUR",
-        "AZARD",
-        "AVEX",
-        "Avery",
-        "AVerM",
-        "AVENGE",
-        "AVAST",
-        "AUTHOR",
-        "AutoEx",
-        "AURAMAX",
-        "Technic",
-        "ATLAS",
-        "ATLANT",
-        "ATEMI",
-        "ASUS",
-        "ASRock",
-        "Artway",
-        "STYLE",
-        "PLAYS",
-        "LAMP",
-        "AROZZI",
-        "Media",
-        "ARK",
-        "Ariston",
-        "ARIEL",
-        "Arian",
-        "Ardo",
-        "EQUAT",
-        "AQUAPO",
-        "AQUAF",
-        "GAELLE",
-        "AquaWork",
-        "AFAR",
-        "APPLET",
-        "Apple",
-        "APC",
-        "AOS",
-        "AOpen",
-        "AOC",
-        "ANKER",
-        "ANIMAL",
-        "Angelcare",
-        "ANDREA",
-        "ANDIS",
-        "AMELY",
-        "AMD",
-        "AMBRE",
-        "AMAZ",
-        "AM-PM",
-        "ALWAYS",
-        "ALUMET"
-    ];
-    const rndItem = (a) => a[Math.floor(Math.random() * a.length)];
-    const rndFloat = () => (Math.random() * (maxPrice - minPrice) + minPrice).toFixed(2);
-    const rndInt = (min, max) => Math.floor(Math.random() * (max - min + 1) + min);
-
-    const items = [];
-
-    const add = (totalItems) => {
-        while (totalItems--) {
-            items.push({
-                id: totalItems,
-                title: rndItem(names),
-                price: rndFloat(),
-                img: `http://lorempixel.com/${rndInt(100, 400)}/${rndInt(200, 600)}/technics`,
-                description: 'Отличный товар!'
-            });
-        }
-    };
-
-    return {
-        add,
-        getItems: () => items,
-    };
-})();
-
-const renderProduct = ({id = 0, title = '', price = 0, img = '', description = ''}) => {
-    if (!price) {
-        return '';
+class ProductItem {
+    constructor(product) {
+        this.title = product.title;
+        this.price = product.price;
+        this.id = product.id;
+        this.img = product.img || 'http://lorempixel.com/200/150/technics'
     }
 
-    return `
-      <div class="product">
-        <div class="productId">${id}</div>
-        <div class="productAside" style="background-image: url('${img}')"></div>
-        <div class="productDetails">
-            <div class="productData">
-              <div class="productTitle">${title}</div>
-              <div class="productPrice">${price}</div>
+    render() {
+        return `
+          <div class="product" data-id="${this.id}">
+            <div class="productDetails" style="background-image: url('${this.img}')">
+                  <div class="productTitle">${this.title}</div>
+                  <div class="productPrice">${this.price}\u20bd</div>
+                  <button class="productButton">В корзину</button>
             </div>
-            <div class="productControls">
-              <div class="productDescription">${description}</div>
-              <button class="productButton" data-id="${id}">Мне такое надо!</button>
-            </div>
-        </div>
-      </div>
-  `;
-};
+            <div class="productId">${this.id}</div>
+          </div>
+        `;
+    }
+}
 
-const renderProducts = () => {
-    products.add(50);
-    document.querySelector('.products').innerHTML = products.getItems().map(renderProduct).join('');
-};
+class ProductList {
+    #privateProp;
+    constructor(container = '.products') {
+        this.container = container;
+        this.goods = [];
+        this.allProducts = [];
+        this.#privateProp = '123';
 
-renderProducts();
+        this.#fetchProducts();
+        this.render();
+        this.renderTotal();    
+    }
 
-document.getElementById('logo')
-    .addEventListener('click', () => {
+    get prop() {
+        return this.#privateProp = value;
+    }
+
+    #fetchProducts() {
+        this.goods = [
+            {id: 1, title: 'Notebook', price: 20000},
+            {id: 2, title: 'Mouse', price: 1500},
+            {id: 3, title: 'Keyboard', price: 5000},
+            {id: 4, title: 'Gamepad', price: 4500}
+        ];
+    }
+    getTotal() {
+        return this.goods.reduce((a, good) => a + good.price, 0);
+    }
+  
+    addProduct(id) {
+        id = parseInt(id, 10);
+  
+        this.goods.push(
+            this.goods.find(good => good.id === id)
+        );
+    }
+  
+    renderTotal() {
+        document.getElementById('cart-total').innerHTML = 
+          `Всего ${this.goods.length} на ${this.getTotal()} \u20bd`;        
+    }
+
+    render() {
+        const block = document.querySelector(this.container);
+    
+        for (let product of this.goods) {
+          const productObject = new ProductItem(product);
+    
+          this.allProducts.push(productObject);
+          block.insertAdjacentHTML('beforeend', productObject.render());
+        }
+    }
+}
+
+const list = new ProductList();
+
+Array.from(document.querySelectorAll('.product'))
+    .forEach(el => {
+        el.addEventListener('click', () => {
+            list.addProduct(el.dataset.id);
+            list.renderTotal();
+        });
+    });
+
+document.getElementById('logo').addEventListener('click', () => {
     [...document.getElementsByTagName('main')][0].classList.toggle('wide');
 }, false);
+   
 
 // const init = () => {
 //     renderProducts();
