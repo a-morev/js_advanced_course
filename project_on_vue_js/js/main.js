@@ -10,9 +10,19 @@ new Vue({
     products: [],
     imgCatalog: "http://lorempixel.com/200/150/technics",
     cart: [],
+    errorMessage: "",
     isVisibleCart: false,
   },
   computed: {
+    getErrorMessage() {
+      if (this.errorMessage) {
+        return this.errorMessage;
+      }
+      if (!this.cart.length) {
+        return "Нет данных";
+      }
+      return "";
+    },
     cartTotal() {
       return this.cart.reduce((acc, item) => acc + item.price, 0);
     },
@@ -40,6 +50,7 @@ new Vue({
     },
     getJson(url) {
       this.isLoading = true;
+      this.errorMessage = "";
       return fetch(url)
         .then((result) => result.json())
         .finally(() => {
@@ -47,6 +58,7 @@ new Vue({
         })
         .catch((error) => {
           console.log(error);
+          this.errorMessage = "Не удалось выполнить запрос к серверу";
         });
     },
     addProduct(product) {
