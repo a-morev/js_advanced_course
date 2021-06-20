@@ -1,0 +1,122 @@
+[
+  {
+    "action": "add",
+    "product_name": "Наушники",
+    "time": 1624212645238
+  },
+  {
+    "action": "add",
+    "product_name": "Наушники",
+    "time": 1624212647456
+  },
+  {
+    "action": "remove",
+    "product_name": "Наушники",
+    "time": 1624212661349
+  },
+  {
+    "action": "remove",
+    "product_name": "Наушники",
+    "time": 1624212662413
+  },
+  {
+    "action": "add",
+    "product_name": "Коврик",
+    "time": 1624212665425
+  },
+  {
+    "action": "add",
+    "product_name": "Коврик",
+    "time": 1624212666110
+  },
+  {
+    "action": "add",
+    "product_name": "Коврик",
+    "time": 1624212666646
+  },
+  {
+    "action": "add",
+    "product_name": "Ноутбук",
+    "time": 1624212668462
+  },
+  {
+    "action": "remove",
+    "product_name": "Ноутбук",
+    "time": 1624212831646
+  },
+  {
+    "action": "remove",
+    "product_name": "Коврик",
+    "time": 1624212832509
+  },
+  {
+    "action": "remove",
+    "product_name": "Коврик",
+    "time": 1624212834580
+  },
+  {
+    "action": "remove",
+    "product_name": "Коврик",
+    "time": 1624212835284
+  },
+  {
+    "action": "add",
+    "product_name": "Ноутбук",
+    "time": 1624212843905
+  },
+  {
+    "action": "add",
+    "product_name": "Ноутбук",
+    "time": 1624212846047
+  },
+  {
+    "action": "add",
+    "product_name": "Коврик",
+    "time": 1624212846830
+  },
+  {
+    "action": "remove",
+    "product_name": "Ноутбук",
+    "time": 1624212853591
+  },
+  {
+    "action": "remove",
+    "product_name": "Ноутбук",
+    "time": 1624212854485
+  },
+  {
+    "action": "remove",
+    "product_name": "Коврик",
+    "time": 1624212855269
+  },
+  {
+    "action": "add",
+    "product_name": "Ноутбук",
+    "time": 1624212867674
+  },
+  {
+    "action": "remove",
+    "product_name": "Ноутбук",
+    "time": 1624212871377
+  },
+  {
+    "action": "add",
+    "product_name": "Наушники",
+    "time": 1624212897346
+  },
+  {
+    "action": "add",
+    "product_name": "Ноутбук",
+    "time": 1624212898044
+  },
+  {
+    "action": "remove",
+    "product_name": "Наушники",
+    "time": 1624212919853
+  },
+  {
+    "action": "remove",
+    "product_name": "Ноутбук",
+    "time": 1624212920740
+  }
+]
